@@ -1,4 +1,14 @@
-## Welcome to GitHub Pages
+## 简介
+感谢您选择miBEE智能家居，这里是一些调试经验的分享，希望能帮到你，如果仍有疑问，请联系miBEE售后服务。
+
+### 主机调试
+
+### 485设备调试
+
+### Enocean设备调试
+
+
+
 
 You can use the [editor on GitHub](https://github.com/mibeeiot/mibeeiot.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
