@@ -7,7 +7,7 @@
 
 ### Enocean设备调试
 
-
+#### [siri语音控制](https://github.com/mibeeiot/mibeeiot.github.io/wiki/Siri)
 
 
 You can use the [editor on GitHub](https://github.com/mibeeiot/mibeeiot.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
