@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			background: url("./backmap.png") no-repeat 0px 0px;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="canvas" width="1280" height="660"> </canvas>
+
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		var c = canvas.getContext('2d');
+		var yImg = new Image();
+		yImg.src = "./backmap.png";
+		var target = [{}];
+
+		//站点列表
+		var stations = [
+			{
+				mname : "松江南站",
+				mxpos : 52,
+				mypos : 617,
+			}, {
+				mname : "松江新城",
+				mxpos : 52,
+				mypos : 420,
+			}, {
+				mname : "VirtualNode",
+				mxpos : 392,
+				mypos : 85,
+			}, {
+				mname : "肇嘉浜路",
+				mxpos : 1256,
+				mypos : 85,
+			}
+			];
+		
+		yImg.onload = function () {
+			var bg = c.createPattern(yImg, 'repeat');
+			c.fillStyle = bg;
+			c.fillRect(0, 0, 1280, 660)
+
+			//创建几辆列车
+			for(var i = 0; i < 6; i++)
+			{
+				var obj = {};
+				
+				if(0 == i%2)
+				{
+					obj.currentStation = randomNum(0, stations.length-2);//随机找到一个站点(但不是结尾站点,为的是方便处理下一个站点)
+					obj.nextStation = obj.currentStation + 1;//下一个站点
+					obj.direction = true;//正向
+				}
+				else {
+					obj.currentStation = randomNum(1, stations.length-1);//随机找到一个站点(但不是开始站点,为的是方便处理下一个站点)
+					obj.nextStation = obj.currentStation - 1;//下一个站点
+					obj.direction = false;//反向
+				}
+				obj.x = stations[obj.currentStation].mxpos;
+				obj.y = stations[obj.currentStation].mypos;
+				obj.xend = stations[obj.nextStation].mxpos;
+				obj.yend = stations[obj.nextStation].mypos;
+				var xMove = obj.xend - obj.x;//x轴移动像素
+				var yMove = obj.yend - obj.y;//y轴移动像素
+				var tMove = Math.abs(xMove);//默认移动时间以X的移动时间为准
+				if(tMove < 1)
+				{
+					tMove = 1;
+				}
+				if(Math.abs(yMove) > tMove)
+				{
+					tMove = Math.abs(yMove);//移动时间以y的移动时间为准
+				}
+				obj.speedX = xMove/tMove;//x轴移动速度
+				obj.speedY = yMove/tMove;//y轴移动速度
+				obj.deg = 0;
+				obj.delay = 0;//到站等待时间
+				//随机颜色
+				var colorR = randomNum(0, 255);
+				var colorG = randomNum(0, 255);
+				var colorB = randomNum(0, 255);
+				obj.cl = 'rgb(' + colorR + ',' + colorG + ',' + colorB +')';
+				//保存对象
+				target[i] = obj;
+				//第一次绘制
+				drawStar(c, target[i].x, target[i].y, 15, 5, target[i].deg, target[i].cl);
+			}
+
+
+			setInterval(function () {
+				//更新画布
+				var bg = c.createPattern(yImg, 'repeat');
+				c.fillStyle = bg;
+				c.fillRect(0, 0, 1280, 660);
+
+				//绘制星星
+				for (var i = 0; i < target.length; i++) {
+
+					var obj = target[i];//取出来对象
+
+					if(obj.delay <= 0)//行程中
+					{
+						obj.x = obj.x + obj.speedX;
+						obj.y = obj.y + obj.speedY;
+
+						if ((Math.abs(obj.xend - obj.x) <= 1)&&(Math.abs(obj.yend - obj.y) <= 1))//到站了
+						{
+							if(stations[obj.nextStation].mname != 'VirtualNode')//虚拟节点，不需要停靠
+							{
+								obj.delay = 100;//到站停靠时间
+							}
+
+							if(obj.direction)//正向
+							{
+								obj.currentStation = obj.nextStation;//到站了
+								obj.nextStation = obj.currentStation + 1;//下一个站点
+								if(obj.nextStation == stations.length)//已经是终点站，需要折返
+								{
+									obj.direction = !obj.direction;//反向
+									obj.currentStation = stations.length-1;//当前站：终点站
+									obj.nextStation = stations.length-2;//下一个站点
+								}
+							}
+							else { //反向
+								obj.currentStation = obj.nextStation;//到站了
+								obj.nextStation = obj.currentStation - 1;//下一个站点
+								if(obj.nextStation < 0)//已经是终点站，需要折返
+								{
+									obj.direction = !obj.direction;//反向
+									obj.currentStation = 0;//当前站：终点站
+									obj.nextStation = 1;//下一个站点
+								}
+							}
+							obj.x = stations[obj.currentStation].mxpos;
+							obj.y = stations[obj.currentStation].mypos;
+							obj.xend = stations[obj.nextStation].mxpos;
+							obj.yend = stations[obj.nextStation].mypos;
+							var xMove = obj.xend - obj.x;//x轴移动像素
+							var yMove = obj.yend - obj.y;//y轴移动像素
+							var tMove = Math.abs(xMove);//默认移动时间以X的移动时间为准
+							if(Math.abs(yMove) > Math.abs(xMove))
+							{
+								tMove = Math.abs(yMove);//移动时间以y的移动时间为准
+							}
+							obj.speedX = xMove/tMove;//x轴移动速度
+							obj.speedY = yMove/tMove;//y轴移动速度
+							obj.deg = 0;
+							//console.log(xMove + "," + yMove + "," + tMove + "," + obj.speedX + "," + obj.speedY);
+						}
+					}
+					else
+					{
+						obj.delay--;
+					}
+
+					drawStar(c, target[i].x, target[i].y, 20, 10, target[i].deg, target[i].cl);
+				}
+
+			}, 5);
+
+
+		}
+
+
+		//取随机数
+		function randomNum(min, max) {
+			return Math.floor(Math.random() * (max - min + 1) + min);
+		}
+		//画星星
+		//x, y为圆心坐标，R、r分别为大圆、小圆半径,rot旋转角度 
+		function drawStar(cxt, x, y, r, R, rot, cl) {
+			cxt.beginPath();
+			for (var i = 0; i < 5; i++) {
+				cxt.lineTo(Math.cos((18 + i * 72 - rot) / 180 * Math.PI) * R + x,
+					-Math.sin((18 + i * 72 - rot) / 180 * Math.PI) * R + y)
+				cxt.lineTo(Math.cos((54 + i * 72 - rot) / 180 * Math.PI) * r + x,
+					-Math.sin((54 + i * 72 - rot) / 180 * Math.PI) * r + y)
+			}
+			cxt.closePath();
+			cxt.lineWidth = 3;
+			cxt.fillStyle = cl;
+			cxt.strokeStyle = cl;
+			cxt.lineJoin = "round";
+			cxt.fill();
+			cxt.stroke();
+		}
+
+	</script>
+
+
+</html>
