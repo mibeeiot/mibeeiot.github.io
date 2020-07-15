@@ -84,8 +84,8 @@
 				{
 					tMove = Math.abs(yMove);//移动时间以y的移动时间为准
 				}
-				obj.speedX = xMove/tMove;//x轴移动速度
-				obj.speedY = yMove/tMove;//y轴移动速度
+                obj.speedX = (xMove/tMove) * 2;//x轴移动速度
+                obj.speedY = (yMove/tMove) * 2;//y轴移动速度
 				obj.deg = 0;
 				obj.delay = 0;//到站等待时间
 				//随机颜色
@@ -155,8 +155,8 @@
 							{
 								tMove = Math.abs(yMove);//移动时间以y的移动时间为准
 							}
-							obj.speedX = xMove/tMove;//x轴移动速度
-							obj.speedY = yMove/tMove;//y轴移动速度
+							obj.speedX = (xMove/tMove) * 2;//x轴移动速度
+							obj.speedY = (yMove/tMove) * 2;//y轴移动速度
 							obj.deg = 0;
 							//console.log(xMove + "," + yMove + "," + tMove + "," + obj.speedX + "," + obj.speedY);
 						}
