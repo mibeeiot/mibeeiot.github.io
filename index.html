@@ -51,7 +51,7 @@
 			}
 			];
             
-        yImg.onload = function () {
+        carImg.onload = function () {
             carImgLoaded = true;
         }
 		
@@ -211,7 +211,7 @@
 		//画星星
 		//x, y为圆心坐标，R、r分别为大圆、小圆半径,rot旋转角度 
 		function drawStar(cxt, x, y, r, R, rot, cl) {
-            if(!carImgLoaded)
+            if(carImgLoaded)
             {
                 cxt.translate(x, y);
                 cxt.rotate(rot);
