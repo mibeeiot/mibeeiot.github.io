@@ -25,6 +25,9 @@
 		var c = canvas.getContext('2d');
 		var yImg = new Image();
 		yImg.src = "./backmap.png";
+        var carImg = new Image();
+		carImg.src = "./car.png";
+        var carImgLoaded = false;
 		var target = [{}];
 
 		//站点列表
@@ -47,6 +50,10 @@
 				mypos : 85,
 			}
 			];
+            
+        yImg.onload = function () {
+            carImgLoaded = true;
+        }
 		
 		yImg.onload = function () {
 			var bg = c.createPattern(yImg, 'repeat');
@@ -155,9 +162,32 @@
 							{
 								tMove = Math.abs(yMove);//移动时间以y的移动时间为准
 							}
-							obj.speedX = (xMove/tMove) * 2;//x轴移动速度
-							obj.speedY = (yMove/tMove) * 2;//y轴移动速度
-							obj.deg = 0;
+							obj.speedX = (xMove/tMove) * 1;//x轴移动速度
+							obj.speedY = (yMove/tMove) * 1;//y轴移动速度
+                            obj.deg = 0;
+                            
+                            //计算旋转角度
+                            if((xMove < 0.5)&&(xMove > -0.5))//X轴不移动的情况
+                            {
+                                if(yMove > 0)//向上
+                                {
+                                    obj.deg = Math.PI/2;
+                                }
+                                else//向下
+                                {
+                                    obj.deg = -Math.PI/2;
+                                }
+                            }
+                            else //X轴有移动
+                            {
+                                obj.deg = Math.atan(yMove/xMove);//该值只适用于右上、右下方移动的情况
+                                
+                                if(xMove < -0.5)//左上/左下方向
+                                {
+                                    obj.deg += Math.PI;
+                                }
+                            }
+							
 							//console.log(xMove + "," + yMove + "," + tMove + "," + obj.speedX + "," + obj.speedY);
 						}
 					}
@@ -171,7 +201,6 @@
 
 			}, 5);
 
-
 		}
 
 
@@ -182,20 +211,31 @@
 		//画星星
 		//x, y为圆心坐标，R、r分别为大圆、小圆半径,rot旋转角度 
 		function drawStar(cxt, x, y, r, R, rot, cl) {
-			cxt.beginPath();
-			for (var i = 0; i < 5; i++) {
-				cxt.lineTo(Math.cos((18 + i * 72 - rot) / 180 * Math.PI) * R + x,
-					-Math.sin((18 + i * 72 - rot) / 180 * Math.PI) * R + y)
-				cxt.lineTo(Math.cos((54 + i * 72 - rot) / 180 * Math.PI) * r + x,
-					-Math.sin((54 + i * 72 - rot) / 180 * Math.PI) * r + y)
-			}
-			cxt.closePath();
-			cxt.lineWidth = 3;
-			cxt.fillStyle = cl;
-			cxt.strokeStyle = cl;
-			cxt.lineJoin = "round";
-			cxt.fill();
-			cxt.stroke();
+            if(!carImgLoaded)
+            {
+                cxt.translate(x, y);
+                cxt.rotate(rot);
+                cxt.drawImage(carImg,-24,-24);
+                cxt.rotate(-rot);
+                cxt.translate(-x, -y);
+            }
+			else
+            {
+                cxt.beginPath();
+                for (var i = 0; i < 5; i++) {
+                    cxt.lineTo(Math.cos((18 + i * 72 - rot) / 180 * Math.PI) * R + x,
+                        -Math.sin((18 + i * 72 - rot) / 180 * Math.PI) * R + y)
+                    cxt.lineTo(Math.cos((54 + i * 72 - rot) / 180 * Math.PI) * r + x,
+                        -Math.sin((54 + i * 72 - rot) / 180 * Math.PI) * r + y)
+                }
+                cxt.closePath();
+                cxt.lineWidth = 3;
+                cxt.fillStyle = cl;
+                cxt.strokeStyle = cl;
+                cxt.lineJoin = "round";
+                cxt.fill();
+                cxt.stroke();
+            }
 		}
 
 	</script>
